@@ -3,6 +3,7 @@ from tkinter import filedialog, messagebox
 import os
 import hashlib
 import time
+import alert
 
 root = tb.Window(themename="superhero")
 root.title("Integrity Checker")
@@ -47,7 +48,7 @@ def addPath():
 
 def monitor():
     try:
-        root.iconify()
+        #root.iconify()
         file_hash_dict = {}
         files_to_delete = []
         #files_to_update=[]
@@ -61,6 +62,7 @@ def monitor():
             file_hash_dict[file_path] = file_hash
 
         while True:
+            test = 'it21049972@my.sliit.lk'
             x=1
             time.sleep(1)
             files = os.listdir(mydir)
@@ -69,12 +71,17 @@ def monitor():
                 file_path = os.path.join(mydir, file)
                 if hash_value not in file_hash_dict.values():
                     print(f"{file_path} file created or edited ")
-                    file_hash_dict[file_path] = hash_value
+                    file_hash_dict[file] = hash_value
+                    alert.new_send(test,file_path)
+                   # print(file_hash_dict)
                     x=0
 
+            files = os.listdir(mydir)
             for key in file_hash_dict.keys():
                 if key not in files:
                     print(f"{key} has been deleted!")
+                    rem=key
+                    alert.send_email(test,rem)
                     files_to_delete.append(key)
                     x=0
 
