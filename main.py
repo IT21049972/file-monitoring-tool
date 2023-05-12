@@ -24,8 +24,8 @@ def calculate_file_hash(directory, filepath):
 def addPath():
     global mydir
     mydir = filedialog.askdirectory()
-    with open('dir_selection.txt', 'w') as f:
-        f.write(mydir)
+    #with open('dir_selection.txt', 'w') as f:
+     #   f.write(mydir)
    # print(mydir)
     files = os.listdir(mydir)
 
@@ -43,10 +43,15 @@ def addPath():
             #print(hash_value)
 
 
+
+
 def monitor():
     try:
         root.iconify()
         file_hash_dict = {}
+        files_to_delete = []
+        #files_to_update=[]
+
         # Load file|hash from baseline.txt and store them in a dictionary
         with open('baseline.txt', 'r') as f:
             file_paths_and_hashes = f.readlines()
@@ -56,6 +61,7 @@ def monitor():
             file_hash_dict[file_path] = file_hash
 
         while True:
+            x=1
             time.sleep(1)
             files = os.listdir(mydir)
             for file in files:
@@ -63,25 +69,29 @@ def monitor():
                 file_path = os.path.join(mydir, file)
                 if hash_value not in file_hash_dict.values():
                     print(f"{file_path} file created or edited ")
+                    file_hash_dict[file_path] = hash_value
+                    x=0
 
             for key in file_hash_dict.keys():
                 if key not in files:
                     print(f"{key} has been deleted!")
+                    files_to_delete.append(key)
+                    x=0
 
-            #file_path = os.path.join(mydir, file)
-                #baseline_file_still_exists = file_path.exists(key)
-                #if key not in baseline_file_still_exists:
+            for key in files_to_delete:
+                del file_hash_dict[key]
+                #print(f"file_hash_dict: {file_hash_dict}")
 
+            if x==0:
+                with open('baseline.txt', 'w') as f:
+                    for file in files:
+                        hash_value = calculate_file_hash(mydir, file)
+                        if hash_value:
+                            f.write(f"{file}|{hash_value}\n")
+                        else:
+                            f.write(f"{file}|ERROR\n")
 
-
-
-
-
-
-
-
-
-
+            monitor()
 
     except Exception as e:
         print(e)
