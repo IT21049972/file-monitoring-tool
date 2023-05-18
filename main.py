@@ -1,21 +1,33 @@
-import sqlite3
+"""
+IT21049972
+"""
 
-import ttkbootstrap as tb
-from tkinter import filedialog, messagebox
-from tkinter import *
+#main.py
 import os
 import hashlib
 import time
+from datetime import datetime
+import re
+import sqlite3
+import stat
+
+from tkinter import filedialog, messagebox
+from tkinter import *
+import ttkbootstrap as tb
+
 import openpyxl
 from openpyxl.utils import get_column_letter
 from openpyxl import Workbook
-from datetime import datetime
-
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 import alert
+import vt
+
+
+import alert
+import vt
 
 conn = sqlite3.connect('user.db')
 c = conn.cursor()
@@ -27,7 +39,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS emails
 root = tb.Window(themename="superhero")
 root.title("Integrity Checker")
 
-mydir =''
+mydir ='' #pylint: disable=invalid-name
 
 wb = Workbook()
 ws = wb.active
@@ -41,17 +53,17 @@ ws['C1'] = 'Time'
 
 def calculate_file_hash(directory, filepath):
     try:
-        with open(os.path.join(directory, filepath), 'rb') as fh:
+        with open(os.path.join(directory, filepath), 'rb') as fh: #pylint: disable=invalid-name
             hasher = hashlib.sha512()
             hasher.update(fh.read())
             hash_value = hasher.hexdigest()
         return hash_value
     except PermissionError:
-            print(f"Error: Permission denied for file {filepath}")
-            return None
+                print(f"Error: Permission denied for file {filepath}")
+                return None
 
 
-def addPath():
+def addPath():  #pylint: disable=invalid-name
     global mydir
     mydir = filedialog.askdirectory()
     #with open('dir_selection.txt', 'w') as f:
@@ -63,7 +75,7 @@ def addPath():
     if os.path.exists(baseline_file):
         os.remove(baseline_file)
 
-    with open(baseline_file, 'a') as f:
+    with open(baseline_file, 'a') as f:  #pylint: disable=invalid-name
         for file in files:
             hash_value = calculate_file_hash(mydir, file)
             if hash_value:
@@ -78,18 +90,21 @@ class FileHandler(FileSystemEventHandler):
         print(f"{event.src_path} has been created!")
 
 def monitor():
+    for widget in root.winfo_children():
+        widget.destroy()
+    #firstScreen()
     try:
         global row_num
-        root.iconify()
+        #root.iconify()
         file_hash_dict = {}
         files_to_delete = []
         #files_to_update=[]
 
         # Load file|hash from baseline.txt and store them in a dictionary
-        with open('baseline.txt', 'r') as f:
+        with open('baseline.txt', 'r') as f:   #pylint: disable=invalid-name
             file_paths_and_hashes = f.readlines()
 
-        for f in file_paths_and_hashes:
+        for f in file_paths_and_hashes:    #pylint: disable=invalid-name
             file_path, file_hash = f.strip().split('|')
             file_hash_dict[file_path] = file_hash
 
@@ -102,12 +117,14 @@ def monitor():
             observer.schedule(FileHandler(), mydir, recursive=False)
             observer.start()
             #test = email
-            x=1
+            x=1     #pylint: disable=invalid-name
             time.sleep(1)
             files = os.listdir(mydir)
+
             for file in files:
                 hash_value = calculate_file_hash(mydir, file)
                 file_path = os.path.join(mydir, file)
+               # vt.check_file_hash(hash_value)
                 if hash_value not in file_hash_dict.values():
                     print(f"{file_path} file created or edited ")
                     ws[f'A{row_num}'] = file_path
@@ -118,12 +135,12 @@ def monitor():
                     file_hash_dict[file] = hash_value
                     #alert.new_send(test,file_path)
                    # print(file_hash_dict)
-                    x=0
+                    x=0     #pylint: disable=invalid-name
 
             files = os.listdir(mydir)
             for key in file_hash_dict.keys():
                 if key not in files:
-                    #print(f"{key} has been deleted!")
+                    print(f"{key} has been deleted!")
                     #rem=key
                     ws[f'A{row_num}'] = file_path
                     ws[f'B{row_num}'] = 'Deleted'
@@ -132,14 +149,15 @@ def monitor():
                     wb.save(excel)
                     #alert.send_email(test,rem)
                     files_to_delete.append(key)
-                    x=0
+                    x=0     #pylint: disable=invalid-name
 
             for key in files_to_delete:
                 del file_hash_dict[key]
                 #print(f"file_hash_dict: {file_hash_dict}")
 
             if x==0:
-                with open('baseline.txt', 'w') as f:
+                with open('baseline.txt', 'w', encoding='utf-8') as f:   #pylint: disable=invalid-name
+                    # Rest of your code that writes to the file
                     for file in files:
                         hash_value = calculate_file_hash(mydir, file)
                         if hash_value:
@@ -174,6 +192,11 @@ def firstScreen():
         if not email:
             messagebox.showerror("Error", "Missing email ")
             return
+        pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+
+        if not re.match(pattern, email):
+            messagebox.showerror("Error", "Invalid email address")
+            return
             # Insert the email into the database
         #c.execute("INSERT INTO emails (email) VALUES (?)", (email,))
         c.execute("DELETE FROM emails")
@@ -204,6 +227,7 @@ class FileHandler(FileSystemEventHandler):
       #  cursor = conn.cursor()
         testt = email
         #alert.new_send(testt, message)
+
 
 
 root.mainloop()

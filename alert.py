@@ -13,7 +13,7 @@ def send_email(receiver,file):
 	#port = 587
 	email_sender = "chikson.49@gmail.com"
 	email_receiver = receiver
-	email_password = os.environ.get("APP_PW")
+	email_password = 'test123'   #os.environ.get("APP_PW")
 
 
 	subject = """ALERT:File {} deleted""".format(file)
