@@ -11,9 +11,9 @@ def send_email(receiver,file):
 
 	#smtp_server = "smtp.gmail.com"
 	#port = 587
-	email_sender = "chikson.49@gmail.com"
+	email_sender = "enter email"
 	email_receiver = receiver
-	email_password = 'test123'   #os.environ.get("APP_PW")
+	email_password = '<app pw>' 
 
 
 	subject = """ALERT:File {} deleted""".format(file)
