@@ -36,7 +36,7 @@ def send_email(receiver,file):
 def new_send(receiver,file):
 	#smtp_server = "smtp.gmail.com"
 	#port = 587
-	email_sender = "chikson.49@gmail.com"
+	email_sender = ""
 	email_receiver = receiver
 	email_password = os.environ.get("APP_PW")
 
